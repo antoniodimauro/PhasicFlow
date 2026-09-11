@@ -1,0 +1,63 @@
+# Prerequisites
+*.d
+*.dep
+
+# files
+testLink.C
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# directories
+Make/linux*/**
+Make/linux*/**/*
+Make/linux*/*
+lnInclude/**
+**/lnInclude/*
+**/Make/linux*/
+test/
+doc/code-documentation/
+doc/DTAGS
+
+# all possible time folders
+**/[0-9]
+**/[0-9][0-9]
+**/[0-9][0-9][0-9]
+**/[0-9][0-9][0-9][0-9]
+**/[0-9][0-9][0-9][0-9][0-9]
+**/[0-9]*.[0-9]
+**/[0-9]*.[0-9][0-9]
+**/[0-9]*.[0-9][0-9][0-9]
+**/[0-9]*.[0-9][0-9][0-9][0-9]
+**/[0-9]*.[0-9][0-9][0-9][0-9][0-9]
+**/[0-9]*.[0-9][0-9][0-9][0-9][0-9][0-9]
+**/[0-9]*.[0-9][0-9][0-9][0-9][0-9][0-9][0-9]
+**/[0-9]*.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]
+**/VTK

@@ -1,0 +1,154 @@
+/* -------------------------------*- C++ -*--------------------------------- *\ 
+|  phasicFlow File                                                            | 
+|  copyright: www.cemf.ir                                                     | 
+\* ------------------------------------------------------------------------- */  
+objectName  particlesDict;
+objectType  dictionary;
+fileFormat  ASCII;
+/*---------------------------------------------------------------------------*/
+
+setFields
+{
+    /*
+        Default value for fields defined for particles:
+
+        These fields should always be defined for simulations with spherical particles
+    */
+    defaultValue 
+    {
+        velocity        realx3 (0 0 0);     // linear velocity (m/s)
+
+        acceleration    realx3 (0 0 0);     // linear acceleration (m/s2)
+
+        rVelocity       realx3 (0 0 0);     // rotational velocity (rad/s)
+
+        shapeName       word  red;     // name of the particle shape 
+    }
+
+    selectors
+    {
+        // white ball
+        velocityAssigne
+        {
+            selector           stridedRange;      
+            stridedRangeInfo
+            {
+                begin         21; // begin index of points
+                end           22; // end index of points 
+                stride        1;  // stride for selector 
+            }
+            fieldValue
+            {
+                shapeName       word  white;     // name of the ball
+                velocity        realx3 (-6 0.5 0);   // linear velocity (m/s)
+                rVelocity       realx3 (-1 0 0); // rotational velocity (rad/s)
+            }
+        }
+        
+
+        shapeAssigne1
+        {
+            selector           stridedRange;      
+            stridedRangeInfo
+            {
+                begin       20;    // begin index of points
+                end         21;    // end index of points 
+                stride      1;    // stride for selector 
+            }
+            fieldValue                            
+            {
+                shapeName       word  blue;
+            }
+        }
+
+        shapeAssigne2
+        {
+            selector           stridedRange;      
+            stridedRangeInfo
+            {
+                begin        19;    // begin index of points
+                end          20;    // end index of points 
+                stride       1;    // stride for selector 
+            }
+
+            fieldValue                            
+            {
+                shapeName word  green;
+            }
+        }
+
+        shapeAssigne3
+        {
+            selector           stridedRange;      
+            stridedRangeInfo
+            {
+                begin          18;    // begin index of points
+                end            19;    // end index of points 
+                stride         1;    // stride for selector 
+            }
+            fieldValue                            
+            {
+                shapeName       word  yellow;     
+            }
+        }
+
+        shapeAssigne4
+        {
+            selector           stridedRange;      
+            stridedRangeInfo
+            {
+                begin          17;    // begin index of points
+                end            18;    // end index of points 
+                stride          1;    // stride for selector 
+            }
+            fieldValue                            
+            {
+                shapeName       word  brown;
+            }
+        }
+
+        shapeAssigne5
+        {
+            selector           stridedRange;      
+            stridedRangeInfo
+            {
+                begin           16;    // begin index of points
+                end             17;    // end index of points 
+                stride          1;    // stride for selector 
+            }
+            fieldValue                            
+            {
+                shapeName       word  pink;     
+            }
+        }
+
+        shapeAssigne6
+        {
+            selector           stridedRange;      
+            stridedRangeInfo
+            {
+                begin           15;    // begin index of points
+                end             16;    // end index of points 
+                stride          1;    // stride for selector 
+            }
+            fieldValue                            
+            {
+                shapeName       word  black;
+            }
+        }
+    }
+}
+
+positionParticles 
+{
+    method        file;                       
+    
+    fileInfo
+    {       
+        name    position.csv;                     
+
+        commaSeparated Yes;                  
+    }
+
+    regionType    domain;                   
+}

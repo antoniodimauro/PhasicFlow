@@ -1,0 +1,56 @@
+/* -------------------------------*- C++ -*--------------------------------- *\ 
+|  phasicFlow File                                                            | 
+|  copyright: www.cemf.ir                                                     | 
+\* ------------------------------------------------------------------------- */  
+objectName     particlesDict;
+objectType     dictionary;
+fileFormat     ASCII;
+/*---------------------------------------------------------------------------*/
+setFields
+{
+    /*
+        Default value for fields defined for particles
+        These fields should always be defined for simulations with 
+        spherical particles
+    */
+
+    defaultValue 
+    {
+        velocity          realx3       (0 0 0);      // linear velocity (m/s)
+
+        acceleration      realx3       (0 0 0);      // linear acceleration (m/s2)
+
+        rVelocity         realx3       (0 0 0);      // rotational velocity (rad/s)
+
+        shapeName         word         glassBead;    // name of the particle shape 
+    }
+
+    selectors
+    {
+    }
+}
+
+positionParticles                                    // positions particles 
+{
+    method ordered;                                  // other options: random and empty
+
+    orderedInfo
+    {
+        distance   0.003;                            // minimum distance between particles centers
+
+        numPoints  250000;                           // number of particles in the simulation 
+
+        axisOrder  (z y x);                          // axis order for filling the space with particles
+    }
+
+    regionType cylinder;                             // other options: box and sphere  
+
+    cylinderInfo                                     // cylinder information for positioning particles 
+    {
+        p1 (0.0 0.0 0.003);                          // begin point of cylinder axis
+
+        p2 (0.0 0.0 0.357);                          // end point of cylinder axis
+
+        radius     0.117;                            // radius of cylinder 
+    }
+}

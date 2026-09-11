@@ -1,0 +1,10 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+echo "  -> detected OpenFOAM version: $WM_PROJECT_VERSION"
+
+wclean ./phasicFlowCoupling 
+solvers/wclean
+utilities/wclean
+
+#------------------------------------------------------------------------------
