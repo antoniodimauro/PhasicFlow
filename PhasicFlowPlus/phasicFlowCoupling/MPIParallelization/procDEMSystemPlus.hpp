@@ -63,6 +63,12 @@ public:
 		return startTime_;
 	}
 
+	inline
+	DEMSystem* demSystemPtr()
+	{
+		return demSystem_.get();
+	}
+
 	inline 
 	bool getDataFromDEM()
 	{

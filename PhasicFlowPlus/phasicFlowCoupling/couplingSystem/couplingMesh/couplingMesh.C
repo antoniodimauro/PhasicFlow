@@ -62,6 +62,21 @@ void pFlow::coupling::couplingMesh::resetTree()const
      
 }
 
+Foam::label pFlow::coupling::couplingMesh::findNearestCellTree
+(
+    const realx3& p,
+    Foam::scalar  maxDist
+)const
+{
+    if(!cellTreeSearch_) return -1;
+
+    const Foam::point pt(p.x(), p.y(), p.z());
+
+    const auto info = cellTreeSearch_->findNearest(pt, maxDist*maxDist);
+
+    return info.hit() ? info.index() : -1;
+}
+
 void pFlow::coupling::couplingMesh::mapParticles()
 {
     const auto& cm = parCellIndex_.centerMass();

@@ -1,7 +1,7 @@
 ptFLAGS += -std=c++17 -Wno-old-style-cast
 
-pFlow_Project = $(pFlow_PROJECT_DIR)
-pFlow_INCLUDE_DIR =$(pFlow_Project)/include
+pFlow_Project     = $(WM_PROJECT_USER_DIR)/platforms/$(WM_OPTIONS)
+pFlow_INCLUDE_DIR = $(pFlow_Project)/include
 
 -include $(GENERAL_RULES)/mpi-rules
 

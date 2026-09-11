@@ -32,7 +32,6 @@ pFlow::particleIdHandler::particleIdHandler(pointStructure& pStruct)
 			objectFile::WRITE_ALWAYS
 		),
 		pStruct,
-		static_cast<uint32>(-1),
 		static_cast<uint32>(-1)
 	)
 {

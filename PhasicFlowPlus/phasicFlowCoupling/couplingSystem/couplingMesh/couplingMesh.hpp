@@ -207,6 +207,9 @@ public:
 		Foam::label
 		findCellTree(const realx3& p, Foam::label cellId)const;
 
+		Foam::label
+		findNearestCellTree(const realx3& p, Foam::scalar maxDist)const;
+
 		template<unsigned Size>
 		void findPointsInCells(
 			const Foam::FixedList<Foam::point, Size>& points, 

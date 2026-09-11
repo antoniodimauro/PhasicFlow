@@ -221,8 +221,8 @@ public:
 
 		history.overlap_t_ += Vt*dt;
 
-		real mi = 3*Pi/4*pow(Ri,static_cast<real>(3))*rho_[propId_i];
-		real mj = 3*Pi/4*pow(Rj,static_cast<real>(3))*rho_[propId_j];
+		real mi = static_cast<real>(4.0/3.0)*Pi*pow(Ri,static_cast<real>(3))*rho_[propId_i];
+		real mj = static_cast<real>(4.0/3.0)*Pi*pow(Rj,static_cast<real>(3))*rho_[propId_j];
 		real Reff = 1.0/(1/Ri + 1/Rj);
 
 		real K_hertz = 4.0/3.0*prop.Yeff_*sqrt(Reff);

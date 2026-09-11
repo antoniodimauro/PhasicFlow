@@ -4,6 +4,8 @@ domainDistribute/domainDistribute.cpp
 DEMSystem/DEMSystem.cpp
 sphereDEMSystem/sphereFluidParticles.cpp
 sphereDEMSystem/sphereDEMSystem.cpp
+sphereDEMSystem/sphereFluidParticlesImplicit.cpp
+sphereDEMSystem/sphereDEMSystemSemiImplicit.cpp
 grainDEMSystem/grainFluidParticles.cpp
 grainDEMSystem/grainDEMSystem.cpp
 

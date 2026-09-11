@@ -12,6 +12,7 @@ if [ "$WM_PROJECT_VERSION" = "9" ] || [ "$WM_PROJECT_VERSION" = "10" ] || [ "$WM
 elif [ "$WM_PROJECT_VERSION" = "v2406" ] || [ "$WM_PROJECT_VERSION" = "v2412" ] || [ "$WM_PROJECT_VERSION" = "v2506" ] || [ "$WM_PROJECT_VERSION" = "v2512" ]; then
     echo "  -> building solvers for OpenFOAM $WM_PROJECT_VERSION"
     wmake ./unresolvedSpherePFPlus
+    wmake ./unresolvedSphereSemiImplicitPFPlus
     wmake ./unresolvedGrainPFPlus
     wmake ./resolvedSpherePFPlus
     wmake ./resolvedSphereVoFPFPlus

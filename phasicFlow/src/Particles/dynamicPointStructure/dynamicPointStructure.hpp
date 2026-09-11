@@ -58,6 +58,10 @@ private:
 
 public:
 
+	integration& integrationPos() { return integrationPos_(); }
+
+	integration& integrationVel() { return integrationVel_(); }
+
 	TypeInfo("dynamicPointStructure");
 
 	explicit dynamicPointStructure(systemControl& control, real maxBSphere);

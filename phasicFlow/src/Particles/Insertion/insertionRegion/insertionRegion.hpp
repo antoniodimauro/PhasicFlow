@@ -99,8 +99,9 @@ private:
 	/// @brief time control for insertion events
 	baseTimeControl           tControl_;
 
-	/// rate of insertion
-	real                      rate_;
+	real                      rate_ = 0;
+
+	uint32                    countPerEvent_ = 0;
 
 	/// number of inserted particles
 	uint32                    numInserted_ = 0;
@@ -176,6 +177,11 @@ public:
 		return tControl_.eventTime(iter, t, dt);
 	}
 
+	inline bool usesCountPerEvent() const
+	{
+		return countPerEvent_ != 0u;
+	}
+
 	uint32        numberToBeInserted(uint32 iter, real t, real dt);
 
 	inline uint32 addToNumInserted(uint32 newInserted)
@@ -186,6 +192,15 @@ public:
 	inline uint32 totalInserted() const
 	{
 		return numInserted_;
+	}
+
+	inline void setNumInserted(uint32 n)
+	{
+		numInserted_ = n;
+		if (mixture_)
+		{
+			mixture_().rewindTo(n);
+		}
 	}
 
 	auto& mixture()

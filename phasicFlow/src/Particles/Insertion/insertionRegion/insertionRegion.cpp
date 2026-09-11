@@ -69,7 +69,41 @@ pFlow::insertionRegion::readInsertionRegion(const dictionary& dict)
 {
 	type_ = dict.getVal<word>("regionType");
 
+	const bool hasCount = dict.containsDataEntry("numberPerInsertion");
+	const bool hasRate  = dict.containsDataEntry("rate");
+
+	if (hasCount && hasRate)
+	{
+		fatalErrorInFunction
+		  << "both numberPerInsertion and rate are specified in dictionary "
+		  << dict.globalName() << ". They are mutually exclusive: use "
+		  << "numberPerInsertion for an exact count on every insertion event, "
+		  << "or rate for a particle/s feed." << endl;
+		return false;
+	}
+
+	if (hasCount)
+	{
+		countPerEvent_ = dict.getVal<uint32>("numberPerInsertion");
+		if (countPerEvent_ == 0u)
+		{
+			fatalErrorInFunction
+			  << "numberPerInsertion must be greater than zero in dictionary "
+			  << dict.globalName() << ". Deactivate the region instead." << endl;
+			return false;
+		}
+	}
+	else if (hasRate)
+	{
 	rate_ = dict.getVal<real>("rate");
+	}
+	else
+	{
+		fatalErrorInFunction
+		  << "neither numberPerInsertion nor rate is specified in dictionary "
+		  << dict.globalName() << endl;
+		return false;
+	}
 
 	pRegion_ = peakableRegion::create(type_, dict.subDict(type_ + "Info"));
 
@@ -103,7 +137,12 @@ bool
 pFlow::insertionRegion::writeInsertionRegion(dictionary& dict) const
 {
 	
-	if(!dict.add("rate", rate_))
+	if(usesCountPerEvent())
+	{
+		if(!dict.add("numberPerInsertion", countPerEvent_))
+			return false;
+	}
+	else if(!dict.add("rate", rate_))
 		return false;
 
 	if(!tControl_.write(dict))
@@ -176,6 +215,28 @@ pFlow::insertionRegion::numberToBeInserted(uint32 iter, real t, real dt)
 {
 	if (!tControl_.isInRange(iter, t, dt))
 		return 0u;
+
+	if (usesCountPerEvent())
+	{
+		uint64 k;
+		if (tControl_.isTimeStep())
+		{
+			k = static_cast<uint64>(iter - tControl_.startIter()) /
+			    static_cast<uint64>(tControl_.iInterval());
+		}
+		else
+		{
+			k = static_cast<uint64>(
+			  (t - tControl_.startTime()) / tControl_.rInterval() + 0.5
+			);
+		}
+
+		const uint64 expected = (k + 1u) * static_cast<uint64>(countPerEvent_);
+
+		return expected > numInserted_
+		         ? static_cast<uint32>(expected - numInserted_)
+		         : 0u;
+	}
 
 	if (tControl_.isTimeStep())
 	{

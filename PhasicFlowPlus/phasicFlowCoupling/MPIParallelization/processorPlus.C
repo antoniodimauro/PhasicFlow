@@ -52,8 +52,33 @@ void pFlow::Plus::processor::finalizeMPI()
 	}
 }
 
+static void wireReportStreams__()
+{
+	static bool done = false;
+
+	if(done || !pFlow::Plus::processor::isInitialized()) return;
+
+	done = true;
+
+	int rank = 0, size = 1;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+	if(size > 1)
+	{
+		pFlow::pOutput.activatePrefix();
+		pFlow::pOutput.setPrefixNum(rank);
+		pFlow::errReport.activatePrefix();
+		pFlow::errReport.setPrefixNum(rank);
+	}
+
+	pFlow::mOutput.setMasterSlave(rank == 0);
+}
+
 pFlow::Plus::processor::processor()
 {
+	wireReportStreams__();
+
 	if(isParallel() && !isInitialized())
 	{
 		fatalErrorInFunction<<

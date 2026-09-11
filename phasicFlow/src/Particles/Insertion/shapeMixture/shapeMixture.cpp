@@ -142,6 +142,32 @@ pFlow::shapeMixture::read(const dictionary& dict)
 	return true;
 }
 
+void
+pFlow::shapeMixture::rewindTo(uint32 total)
+{
+	uint32 perCycle = 0;
+	ForAll(i, number_)
+	{
+		perCycle += number_[i];
+	}
+
+	if (perCycle == 0u)
+	{
+		return;
+	}
+
+	const uint32 full = total / perCycle;
+	uint32       rem  = total % perCycle;
+
+	ForAll(i, number_)
+	{
+		const uint32 take = (rem < number_[i] ? rem : number_[i]);
+		numberInserted_[i] = full * number_[i] + take;
+		rem -= take;
+		current_[i] = numberInserted_[i] % number_[i];
+	}
+}
+
 bool
 pFlow::shapeMixture::write(dictionary& dict) const
 {

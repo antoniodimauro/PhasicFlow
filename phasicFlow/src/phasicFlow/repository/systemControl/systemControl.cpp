@@ -179,6 +179,9 @@ pFlow::systemControl::systemControl(
         makeUnique<repository>(caseSetupRepository__, caseSetupFolder__, this)
     ),
     libs_(settingsDict_()),
+    outFilePrecision_(
+        settingsDict_().getValOrSet("outFilePrecision", static_cast<uint64>(6))
+    ),
     externalTimeControl_(true),
     timers_(runName_),
     timersReport_(settingsDict_->getValOrSet("timersReport", Logical("Yes"))),

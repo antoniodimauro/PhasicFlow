@@ -21,6 +21,8 @@ interaction/interaction.cpp
 sphereInteraction/sphereInteractionsLinearModels.cpp
 sphereInteraction/sphereInteractionsNonLinearModels.cpp
 sphereInteraction/sphereInteractionsNonLinearModModels.cpp
+sphereInteraction/sphereInteractionsCostaModels.cpp
+sphereInteraction/sphereInteractionsLubModels.cpp
 
 grainInteraction/grainInteractionsLinearModels.cpp
 grainInteraction/grainInteractionsNonLinearModels.cpp

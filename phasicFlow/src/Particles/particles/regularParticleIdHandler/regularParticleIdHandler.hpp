@@ -56,6 +56,11 @@ public:
 		return maxId_;
 	}
 
+	void setMaxId(uint32 id)
+	{
+		maxId_ = id;
+	}
+
 };
 
 }

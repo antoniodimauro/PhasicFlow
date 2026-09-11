@@ -23,8 +23,7 @@ Licence:
 
 bool pFlow::sphereDEMSystem::loop()
 {
-
-	do 
+	while(!Control().time().reachedStopAt())
 	{
 		//
 		if(! insertion_().insertParticles( 
@@ -54,7 +53,8 @@ bool pFlow::sphereDEMSystem::loop()
 		
 		geometry_->afterIteration();
 
-	}while(Control()++);
+		if(!Control()++) break;
+	}
 
 	return true;
 }

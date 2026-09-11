@@ -27,3 +27,4 @@ template class pFlow::PeakableRegion<pFlow::box>;
 template class pFlow::PeakableRegion<pFlow::sphere>;
 
 template class pFlow::PeakableRegion<pFlow::cylinder>;
+template class pFlow::PeakableRegion<pFlow::pointGeom>;

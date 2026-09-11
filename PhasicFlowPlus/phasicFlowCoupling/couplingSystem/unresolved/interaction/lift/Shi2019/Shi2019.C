@@ -127,16 +127,8 @@ void pFlow::coupling::Shi2019::calculateLiftForce
             Foam::scalar eps = Foam::sqrt(Res)/Rep;
             auto eps2 = eps*eps;
 
-            Foam::scalar J;
-            if(eps <= 0.23)
-            {
-                J = -0.04*eps + 2.05*eps2 - 32.2*eps*eps2 + 106.8*eps2*eps2;
-            }
-            else
-            {
-                J = 2.225/Foam::pow(1 + 0.02304/eps2 ,12.77);
-            }
-            Cl_shear = (18.0/Foam::constant::mathematical::pi*Foam::constant::mathematical::pi)*
+            Foam::scalar J = 2.255/Foam::pow(1 + 0.2/eps2 ,1.5);
+            Cl_shear = (18.0/Foam::sqr(Foam::constant::mathematical::pi))*
                 Foam::sqrt(Sr/Rep)*J - 11.0/8.0*Sr*Foam::exp(-0.5*Rep);
         }
         else

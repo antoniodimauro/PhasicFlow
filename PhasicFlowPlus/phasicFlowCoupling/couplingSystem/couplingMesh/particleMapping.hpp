@@ -53,8 +53,12 @@ class particleMapping
     /// Time intervals between domain updates
     Foam::scalar 		domainUpdateInterval_;
 
+    bool                updateEveryTimeStep_ = false;
+
     /// Last time of domain update
     Foam::scalar 		lastTimeUpdated_ = 0;
+
+    Foam::scalar 		lastTimeReported_ = -1;
 
     Plus::scatteredCommunication<real> 		realScatteredComm_;
 

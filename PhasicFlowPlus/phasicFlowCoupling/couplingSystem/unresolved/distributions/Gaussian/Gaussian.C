@@ -82,8 +82,10 @@ pFlow::coupling::Gaussian::Gaussian
 )
 :
     distribution(dict, cMesh, centerMass),	
-    standardDeviation_(lookupDict<Foam::scalar>(dict, "standardDeviation")),
-    maxLayers_(lookupOrDefaultDict<Foam::label>(dict, "maxLayers", 2))
+    standardDeviation_(
+        lookupDict<Foam::scalar>(infoDict(dict, "GaussianInfo"), "standardDeviation")),
+    maxLayers_(
+        lookupOrDefaultDict<Foam::label>(infoDict(dict, "GaussianInfo"), "maxLayers", 2))
 {
     
 }

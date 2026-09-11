@@ -154,6 +154,12 @@ public:
         return useCelldistribution_;
     }
 
+    inline
+    bool hasSupport(Foam::label parIndx)const
+    {
+        return !weights_[parIndx].empty();
+    }
+
     /// Get reference to the coupling mesh
     inline
     const couplingMesh& cMesh()const

@@ -92,7 +92,7 @@ protected:
                     Foam::pow(particleDiameter_[i], static_cast<real>(3.0));
 
             const Foam::label cellId = parCellInd[i];
-            if( cellId >= 0 )
+            if( cellId >= 0 || distributor.hasSupport(i) )
             {
                 distributor.distributeValue_OMP(i, cellId, solidVol, pVol);				
             }

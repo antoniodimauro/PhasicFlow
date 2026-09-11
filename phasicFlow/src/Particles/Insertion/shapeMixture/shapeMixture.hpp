@@ -107,6 +107,8 @@ public:
 		}
 
 		/// Total number inserted particles
+		void rewindTo(uint32 total);
+
 		auto totalInserted()const {
 			return sum(numberInserted_);
 		}

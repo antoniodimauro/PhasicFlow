@@ -73,6 +73,17 @@ public:
 /// Type info
     TypeInfo("distribution");
 
+    static const Foam::dictionary& infoDict(
+        const Foam::dictionary& parrentDict,
+        const Foam::word&       infoName)
+    {
+        if(const Foam::dictionary* subPtr = parrentDict.findDict(infoName))
+        {
+            return *subPtr;
+        }
+        return parrentDict;
+    }
+
     /// Construct from dictionary 
     distribution(
         const Foam::dictionary& 	 parrentDict, 

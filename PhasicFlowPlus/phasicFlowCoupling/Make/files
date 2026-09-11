@@ -17,6 +17,7 @@ couplingSystem/unresolved/turbulence/alphaTurbulentTransportModels.C
 couplingSystem/unresolved/unresolvedCouplingSystem/unresolvedCouplingSystem.C
 couplingSystem/unresolved/momentumSphereUnresolvedCouplingSystem/momentumSphereUnresolvedCouplingSystem.C
 couplingSystem/unresolved/momentumGrainUnresolvedCouplingSystem/momentumGrainUnresolvedCouplingSystem.C
+couplingSystem/unresolved/momentumSemiImplicitSphereUnresolvedCouplingSystem/momentumSemiImplicitSphereUnresolvedCouplingSystem.C
 
 couplingSystem/unresolved/distributions/distribution/distributionBase.C
 couplingSystem/unresolved/distributions/PCM/PCM.C
@@ -24,6 +25,7 @@ couplingSystem/unresolved/distributions/diffusion/diffusion.C
 couplingSystem/unresolved/distributions/distribution/distribution.C
 couplingSystem/unresolved/distributions/adaptiveGaussian/adaptiveGaussian.C
 couplingSystem/unresolved/distributions/GaussianIntegral/GaussianIntegral.C
+couplingSystem/unresolved/distributions/particleGaussian/particleGaussian.C
 couplingSystem/unresolved/distributions/Gaussian/Gaussian.C
 couplingSystem/unresolved/distributions/subDivision29Dist/subDivision29Dist.C
 couplingSystem/unresolved/distributions/subDivision9Dist/subDivision9Dist.C
@@ -35,6 +37,7 @@ couplingSystem/unresolved/porosity/subDivision29/subDivision29Mod.C
 couplingSystem/unresolved/porosity/porosityCellDistribution/porosityCellDistribution.C
 
 couplingSystem/unresolved/interaction/momentumInteraction/momentumInteraction/momentumInteraction.C
+couplingSystem/unresolved/interaction/momentumInteraction/momentumInteractionImplicit/momentumInteractionImplicit.C
 
 couplingSystem/unresolved/interaction/solidAveraging/solidAveraging/solidAveraging.C
 couplingSystem/unresolved/interaction/solidAveraging/particle/particleSolidAveraging.C
@@ -43,7 +46,16 @@ couplingSystem/unresolved/interaction/solidAveraging/distribution/distributionSo
 couplingSystem/unresolved/interaction/fluidAveraging/fluidAveraging/fluidAveraging.C
 couplingSystem/unresolved/interaction/fluidAveraging/cell/cellFluidAveraging.C
 couplingSystem/unresolved/interaction/fluidAveraging/interpolate/interpolateFluidAveraging.C
+couplingSystem/unresolved/interaction/fluidAveraging/cellPoint/cellPointFluidAveraging.C
 couplingSystem/unresolved/interaction/fluidAveraging/distribution/distributionFluidAveraging.C
+
+couplingSystem/unresolved/interaction/fluidAcceleration/fluidAcceleration.C
+couplingSystem/unresolved/interaction/fluidFieldSampler/fluidFieldSampler.C
+
+couplingSystem/unresolved/interaction/sphereQuadrature/sphereQuadrature.C
+couplingSystem/unresolved/interaction/basset/basset.C
+couplingSystem/unresolved/interaction/rotationalHistory/rotationalHistory.C
+couplingSystem/unresolved/interaction/pairInteraction/pairInteraction.C
 
 couplingSystem/unresolved/interaction/drag/drag/drag.C
 couplingSystem/unresolved/interaction/drag/sphereDrag/sphereDrags.C
@@ -53,23 +65,37 @@ couplingSystem/unresolved/interaction/drag/dragClosures/DiFelice.C
 couplingSystem/unresolved/interaction/drag/dragClosures/ErgunWenYu.C
 couplingSystem/unresolved/interaction/drag/dragClosures/Rong.C
 couplingSystem/unresolved/interaction/drag/dragClosures/Beetstra.C
+couplingSystem/unresolved/interaction/drag/dragClosures/SchillerNaumann.C
+couplingSystem/unresolved/interaction/drag/dragClosures/CliftGraceWeber.C
 couplingSystem/unresolved/interaction/drag/dragClosures/noneDrag.C
+couplingSystem/unresolved/interaction/drag/dragImplicit/dragImplicit.C
+couplingSystem/unresolved/interaction/drag/sphereDragImplicit/sphereDragsImplicit.C
 
 couplingSystem/unresolved/interaction/virtualMass/virtualMass/virtualMass.C
 couplingSystem/unresolved/interaction/virtualMass/none/noneVirtualMass.C
 couplingSystem/unresolved/interaction/virtualMass/constantCoeffVirtualMass/constantCoeffVirtualMass.C
+couplingSystem/unresolved/interaction/virtualMass/virtualMassImplicit/virtualMassImplicit.C
+couplingSystem/unresolved/interaction/virtualMass/noneVirtualMassImplicit/noneVirtualMassImplicit.C
+couplingSystem/unresolved/interaction/virtualMass/constantCoeffVirtualMassImplicit/constantCoeffVirtualMassImplicit.C
 
 couplingSystem/unresolved/interaction/lift/lift/lift.C
 couplingSystem/unresolved/interaction/lift/none/none.C
 couplingSystem/unresolved/interaction/lift/Saffmann/Saffmann.C
 couplingSystem/unresolved/interaction/lift/Loth2008/Loth2008.C
 couplingSystem/unresolved/interaction/lift/Shi2019/Shi2019.C
+couplingSystem/unresolved/interaction/lift/liftImplicit/liftImplicit.C
+couplingSystem/unresolved/interaction/lift/noneImplicit/noneImplicit.C
+couplingSystem/unresolved/interaction/lift/Shi2019Implicit/Shi2019Implicit.C
 
 couplingSystem/unresolved/interaction/lift/surfaceRotationTorque/surfaceRotationTorque/surfaceRotationTorque.C
 couplingSystem/unresolved/interaction/lift/surfaceRotationTorque/surfTorqueNone/surfTorqueNone.C
 couplingSystem/unresolved/interaction/lift/surfaceRotationTorque/lowReynolds/lowReynolds.C
 couplingSystem/unresolved/interaction/lift/surfaceRotationTorque/surfTorqueLoth2008/surfTorqueLoth2008.C
 couplingSystem/unresolved/interaction/lift/surfaceRotationTorque/surfTorqueShi2019/surfTorqueShi2019.C
+couplingSystem/unresolved/interaction/lift/surfaceRotationTorque/surfaceRotationTorqueImplicit/surfaceRotationTorqueImplicit.C
+couplingSystem/unresolved/interaction/lift/surfaceRotationTorque/surfTorqueNoneImplicit/surfTorqueNoneImplicit.C
+couplingSystem/unresolved/interaction/lift/surfaceRotationTorque/lowReynoldsImplicit/lowReynoldsImplicit.C
+couplingSystem/unresolved/interaction/lift/surfaceRotationTorque/surfTorqueShi2019Implicit/surfTorqueShi2019Implicit.C
 
 couplingSystem/resolved/resolvedCouplingSystem.C
 

@@ -5,7 +5,29 @@ project(phasicFlow VERSION 1.0 )
 
 set(CMAKE_CXX_STANDARD 20 CACHE STRING "" FORCE)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_INSTALL_PREFIX ${phasicFlow_SOURCE_DIR} CACHE PATH "Install path of phasicFlow" FORCE)
+# install into the OpenFOAM user platforms tree ($FOAM_USER_APPBIN, $FOAM_USER_LIBBIN)
+if(NOT DEFINED pFlow_INSTALL_PREFIX)
+	if(DEFINED ENV{WM_PROJECT_USER_DIR} AND DEFINED ENV{WM_OPTIONS})
+		set(pFlow_INSTALL_PREFIX "$ENV{WM_PROJECT_USER_DIR}/platforms/$ENV{WM_OPTIONS}")
+	else()
+		message(FATAL_ERROR
+			"WM_PROJECT_USER_DIR / WM_OPTIONS are not set. Source the OpenFOAM "
+			"environment first (e.g. 'source /usr/lib/openfoam/openfoam2512/etc/bashrc'), "
+			"or configure with -DpFlow_INSTALL_PREFIX=<path>.")
+	endif()
+endif()
+set(CMAKE_INSTALL_PREFIX "${pFlow_INSTALL_PREFIX}" CACHE PATH "Install path of phasicFlow" FORCE)
+
+# one lib directory (GNUInstallDirs would send Kokkos to lib64 on RHEL)
+set(CMAKE_INSTALL_LIBDIR     lib     CACHE PATH "" FORCE)
+set(CMAKE_INSTALL_BINDIR     bin     CACHE PATH "" FORCE)
+set(CMAKE_INSTALL_INCLUDEDIR include CACHE PATH "" FORCE)
+
+# relative RPATH, so the installed tree resolves itself without LD_LIBRARY_PATH
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INSTALL_RPATH "\$ORIGIN;\$ORIGIN/../lib")
 set(CMAKE_BUILD_TYPE Release CACHE STRING "build type")
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build using shared libraries" FORCE)
 mark_as_advanced(FORCE var BUILD_SHARED_LIBS)
@@ -21,17 +43,15 @@ option(pFlow_Build_Cuda   "Build phasicFlow and backends for Cuda execution" OFF
 option(pFlow_Build_Double "Build phasicFlow with double precision floating-oint variables" ON)
 option(pFlow_Build_MPI    "Build for MPI parallelization. This will enable multi-gpu run, CPU run on clusters (distributed memory machine). Use this combination Cuda+MPI, OpenMP + MPI or Serial+MPI " OFF)
 
-#for installing the required packages
-include(cmake/preReq.cmake)
-
+# the Kokkos backend must be chosen before preReq.cmake adds the kokkos subdirectory
 if(pFlow_Build_Serial)
-	set(Kokkos_ENABLE_SERIAL ON CACHE BOOL "Serial execution" FORCE) 
+	set(Kokkos_ENABLE_SERIAL ON CACHE BOOL "Serial execution" FORCE)
 	set(Kokkos_ENABLE_OPENMP OFF CACHE BOOL "OpenMP execution" FORCE)
 	set(Kokkos_ENABLE_CUDA OFF CACHE BOOL "Cuda execution" FORCE)
 	set(Kokkos_ENABLE_CUDA_LAMBDA OFF CACHE BOOL "Cuda execution" FORCE)
 	set(Kokkos_ENABLE_CUDA_CONSTEXPR OFF CACHE BOOL "Enable constexpr on cuda code" FORCE)
 elseif(pFlow_Build_OpenMP )
-	set(Kokkos_ENABLE_SERIAL ON CACHE BOOL "Serial execution" FORCE) 
+	set(Kokkos_ENABLE_SERIAL ON CACHE BOOL "Serial execution" FORCE)
 	set(Kokkos_ENABLE_OPENMP ON CACHE BOOL "OpenMP execution" FORCE)
 	set(Kokkos_ENABLE_CUDA OFF CACHE BOOL "Cuda execution" FORCE)
 	set(Kokkos_ENABLE_CUDA_LAMBDA OFF CACHE BOOL "Cuda execution" FORCE)
@@ -39,12 +59,15 @@ elseif(pFlow_Build_OpenMP )
 	set(Kokkos_DEFAULT_DEVICE_PARALLEL_EXECUTION_SPACE OpenMP CACHE STRING "" FORCE)
 	set(Kokkos_ENABLE_CUDA_CONSTEXPR OFF CACHE BOOL "Enable constexpr on cuda code" FORCE)
 elseif(pFlow_Build_Cuda)
-	set(Kokkos_ENABLE_SERIAL ON CACHE BOOL "Serial execution" FORCE) 
+	set(Kokkos_ENABLE_SERIAL ON CACHE BOOL "Serial execution" FORCE)
 	set(Kokkos_ENABLE_OPENMP OFF CACHE BOOL "OpenMP execution" FORCE)
 	set(Kokkos_ENABLE_CUDA ON CACHE BOOL "Cuda execution" FORCE)
 	set(Kokkos_ENABLE_CUDA_LAMBDA ON CACHE BOOL "Cuda execution" FORCE)
 	set(Kokkos_ENABLE_CUDA_CONSTEXPR ON CACHE BOOL "Enable constexpr on cuda code" FORCE)
 endif()
+
+#for installing the required packages
+include(cmake/preReq.cmake)
 
 if(pFlow_Build_MPI)
 	find_package(MPI REQUIRED)

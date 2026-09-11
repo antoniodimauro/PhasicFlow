@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#------------------------------------------------------------------------------
+# Copyright (C): Antonio Di Mauro  <antoniodimauro03@gmail.com>
+# Removes the build artefacts; --purge also removes the installed files.
+#------------------------------------------------------------------------------
+set -euo pipefail
+cd "$(dirname "$(readlink -f "$0")")"
+PF_ROOT="$PWD"
+
+[ -n "${WM_PROJECT_DIR:-}" ] || { echo "ERROR: source the OpenFOAM etc/bashrc first." >&2; exit 1; }
+
+PURGE=0
+if [ "${1:-}" = "--purge" ]; then PURGE=1; fi
+
+BUILD="$PF_ROOT/build/${WM_OPTIONS:-none}"
+PREFIX="$WM_PROJECT_USER_DIR/platforms/$WM_OPTIONS"
+
+if [ "$PURGE" = 1 ]; then
+    echo ">>> purging installed files from $PREFIX"
+    # core: exactly what CMake wrote
+    if [ -f "$BUILD/install_manifest.txt" ]; then
+        xargs -r -d '\n' rm -f -- < "$BUILD/install_manifest.txt"
+    else
+        echo "    (no install_manifest.txt in $BUILD - core files left in place;"
+        echo "     run this before deleting the build dir, or remove them by hand)"
+    fi
+    # PhasicFlowPlus
+    rm -f "$PREFIX/bin/unresolvedSpherePFPlus" \
+          "$PREFIX/bin/mapParticleVelocityFromU" \
+          "$PREFIX/lib/libphasicFlowCoupling.so" \
+          "$PREFIX/lib/libpFCouplingUtilities.so"
+fi
+
+echo ">>> cleaning phasicFlow core build dir"
+rm -rf "$BUILD"
+
+echo ">>> cleaning PhasicFlowPlus"
+( cd "$PF_ROOT/PhasicFlowPlus" && ./Allwclean )
+
+echo "done."

@@ -65,7 +65,7 @@ public:
 	
 
 
-private:
+protected:
 	
 	/// const reference to geometry
 	const GeometryMotionModel& 			geometryMotion_;
@@ -110,7 +110,7 @@ private:
 
 	bool createSphereInteraction();
 
-	bool sphereSphereInteraction();
+	virtual bool sphereSphereInteraction();
 
 	bool sphereWallInteraction();
 

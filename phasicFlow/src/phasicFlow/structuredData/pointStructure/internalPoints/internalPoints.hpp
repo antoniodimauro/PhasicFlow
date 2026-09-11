@@ -198,6 +198,13 @@ public:
 		}
 
 		inline
+		void markAllInternalActive(uint32 n)
+		{
+			const uint32 cap = max(pointPosition_.capacity(), n);
+			createDeviceFlag(cap, 0u, n);
+		}
+
+		inline
 		auto activeRange()const
 		{
 			return pFlagsD_.activeRange();

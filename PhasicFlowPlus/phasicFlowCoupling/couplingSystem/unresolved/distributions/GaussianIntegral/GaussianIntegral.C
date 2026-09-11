@@ -31,7 +31,11 @@ pFlow::coupling::GaussianIntegral::GaussianIntegral
 )
 :
     distribution(dict, cMesh, centerMass),
-    maxLayers_(lookupOrDefaultDict(dict, "maxLayers", static_cast<Foam::label>(1)))
+    maxLayers_(
+        lookupOrDefaultDict(
+            infoDict(dict, "GaussianIntegralInfo"),
+            "maxLayers",
+            static_cast<Foam::label>(1)))
 {
 }
 

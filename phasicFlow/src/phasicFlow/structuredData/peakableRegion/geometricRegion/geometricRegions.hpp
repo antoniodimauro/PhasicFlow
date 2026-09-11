@@ -25,6 +25,7 @@ Licence:
 #include "box.hpp"
 #include "sphere.hpp"
 #include "cylinder.hpp"
+#include "pointGeom.hpp"
 
 namespace pFlow
 {
@@ -34,6 +35,8 @@ using boxRegion = geometricRegion<box>;
 using sphereRegion = geometricRegion<sphere>;
 
 using cylinderRegion = geometricRegion<cylinder>;
+
+using pointRegion = geometricRegion<pointGeom>;
 
 }
 

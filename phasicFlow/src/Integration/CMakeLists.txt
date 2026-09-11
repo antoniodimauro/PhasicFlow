@@ -10,6 +10,7 @@ AdamsBashforth5/AdamsBashforth5.cpp
 
 #AdamsMoulton3/AdamsMoulton3.cpp
 #AdamsMoulton4/AdamsMoulton4.cpp
+AdamsMoulton4PEC/AdamsMoulton4PEC.cpp
 #AdamsMoulton5/AdamsMoulton5.cpp
 )
 

@@ -30,6 +30,10 @@ Licence:
 #include "stdAlgorithms.hpp"
 #include "Kokkos_Sort.hpp"
 
+#if defined(_OPENMP) && defined(__GNUC__)
+#include <parallel/algorithm>
+#define PFLOW_HOST_PARALLEL_SORT 1
+#endif
 
 namespace pFlow
 {
@@ -297,9 +301,12 @@ sort(ViewType1D<T, properties...>& view, uint32 start, uint32 end)
 
 	if constexpr (isHostAccessible<ExecutionSpace>())
 	{
-		//auto sView = Kokkos::subview(view, Kokkos::make_pair<uint32,uint32>(start,end));
-		//Kokkos::sort(sView);
-		pFlow::algorithms::STD::sort<T, false>(view.data() + start, numElems);
+		T* first = view.data() + start;
+#ifdef PFLOW_HOST_PARALLEL_SORT
+		__gnu_parallel::sort(first, first + numElems, pFlow::algorithms::less<T>());
+#else
+		pFlow::algorithms::STD::sort<T, false>(first, numElems);
+#endif
 		return;
 	}
 
@@ -330,12 +337,12 @@ sort(
 
 	if constexpr (isHostAccessible<ExecutionSpace>())
 	{
-		// sort without parallelization 
-		pFlow::algorithms::STD::sort<T, CompareFunc,false>(
-		  view.data() + start, numElems, compare
-		);
-		//auto sView = Kokkos::subview(view, Kokkos::make_pair<uint32,uint32>(start,end));
-		//Kokkos::sort(sView, compare);
+		T* first = view.data() + start;
+#ifdef PFLOW_HOST_PARALLEL_SORT
+		__gnu_parallel::sort(first, first + numElems, compare);
+#else
+		pFlow::algorithms::STD::sort<T, CompareFunc, false>(first, numElems, compare);
+#endif
 		return;
 	}
 
