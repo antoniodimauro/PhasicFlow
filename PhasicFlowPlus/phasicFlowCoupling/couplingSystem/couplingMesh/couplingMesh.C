@@ -1,3 +1,5 @@
+// Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+// changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 
 // from OpenFOAM
 
@@ -60,6 +62,21 @@ void pFlow::coupling::couplingMesh::resetTree()const
 
     REPORT(1)<< Blue_Text("Search tree has been reset.")<<END_REPORT;
      
+}
+
+Foam::label pFlow::coupling::couplingMesh::findNearestCellTree
+(
+    const realx3& p,
+    Foam::scalar  maxDist
+)const
+{
+    if(!cellTreeSearch_) return -1;
+
+    const Foam::point pt(p.x(), p.y(), p.z());
+
+    const auto info = cellTreeSearch_->findNearest(pt, maxDist*maxDist);
+
+    return info.hit() ? info.index() : -1;
 }
 
 void pFlow::coupling::couplingMesh::mapParticles()

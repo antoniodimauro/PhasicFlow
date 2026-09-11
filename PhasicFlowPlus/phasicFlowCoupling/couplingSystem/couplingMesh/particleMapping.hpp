@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -53,8 +55,12 @@ class particleMapping
     /// Time intervals between domain updates
     Foam::scalar 		domainUpdateInterval_;
 
+    bool                updateEveryTimeStep_ = false;
+
     /// Last time of domain update
     Foam::scalar 		lastTimeUpdated_ = 0;
+
+    Foam::scalar 		lastTimeReported_ = -1;
 
     Plus::scatteredCommunication<real> 		realScatteredComm_;
 

@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -176,7 +178,7 @@ bool stridedRange<float>::isMember(float val, float epsilon )const
 	if(!isInRange(val)) return false;
 	real dist = val-begin_;
 	if(abs(
-		(dist-(static_cast<uint64>((dist+0.01*epsilon)/stride_)*stride_))
+		(dist-(static_cast<real>(static_cast<uint64>(dist/stride_+0.5))*stride_))
 		)<= epsilon) return true;
 	if(equal(val,begin_))return true;
 	if(equal(val,end_))return true;
@@ -200,7 +202,7 @@ bool stridedRange<double>::isMember(double val, double epsilon )const
 	if(!isInRange(val)) return false;
 	real dist = val-begin_;
 	if(abs(
-		(dist-(static_cast<uint64>((dist+0.01*epsilon)/stride_)*stride_))
+		(dist-(static_cast<real>(static_cast<uint64>(dist/stride_+0.5))*stride_))
 		)<= epsilon) return true;
 	if(equal(val,begin_))return true;
 	if(equal(val,end_))return true;

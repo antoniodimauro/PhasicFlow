@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating
@@ -179,6 +181,9 @@ pFlow::systemControl::systemControl(
         makeUnique<repository>(caseSetupRepository__, caseSetupFolder__, this)
     ),
     libs_(settingsDict_()),
+    outFilePrecision_(
+        settingsDict_().getValOrSet("outFilePrecision", static_cast<uint64>(6))
+    ),
     externalTimeControl_(true),
     timers_(runName_),
     timersReport_(settingsDict_->getValOrSet("timersReport", Logical("Yes"))),

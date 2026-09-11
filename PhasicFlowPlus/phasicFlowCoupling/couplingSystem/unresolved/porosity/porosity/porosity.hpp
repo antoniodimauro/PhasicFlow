@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -61,6 +63,17 @@ private:
 	/// Reference to distribution 
 	const distributionBase&			distribution_;
 
+	// QUESTIONS.md G7: the time index of the last step seen by calculatePorosity, the global particle count of that
+	// step and whether it changed from the step before (an insertion or deletion), plus a counter of the steps whose
+	// dalpha/dt diagnostic has been printed
+	Foam::label						countTimeIndex_ = -1;
+
+	Foam::label						nPrevCount_ = -1;
+
+	bool							countChanged_ = false;
+
+	int								ddtReports_ = 0;
+
 protected:
 
     void setAlphaMin(Foam::scalar newAlphaMin)
@@ -92,7 +105,7 @@ protected:
                     Foam::pow(particleDiameter_[i], static_cast<real>(3.0));
 
             const Foam::label cellId = parCellInd[i];
-            if( cellId >= 0 )
+            if( cellId >= 0 || distributor.hasSupport(i) )
             {
                 distributor.distributeValue_OMP(i, cellId, solidVol, pVol);				
             }

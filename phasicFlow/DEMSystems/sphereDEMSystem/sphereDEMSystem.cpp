@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -23,8 +25,7 @@ Licence:
 
 bool pFlow::sphereDEMSystem::loop()
 {
-
-	do 
+	while(!Control().time().reachedStopAt())
 	{
 		//
 		if(! insertion_().insertParticles( 
@@ -54,7 +55,8 @@ bool pFlow::sphereDEMSystem::loop()
 		
 		geometry_->afterIteration();
 
-	}while(Control()++);
+		if(!Control()++) break;
+	}
 
 	return true;
 }

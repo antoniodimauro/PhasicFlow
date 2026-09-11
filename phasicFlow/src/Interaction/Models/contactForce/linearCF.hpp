@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -243,8 +245,8 @@ public:
 
 		history.overlap_t_ += Vt*dt;
 
-		real mi = 3*Pi/4*pow(Ri,static_cast<real>(3.0))*rho_[propId_i];
-		real mj = 3*Pi/4*pow(Rj,static_cast<real>(3.0))*rho_[propId_j];
+		real mi = static_cast<real>(4.0/3.0)*Pi*pow(Ri,static_cast<real>(3.0))*rho_[propId_i];
+		real mj = static_cast<real>(4.0/3.0)*Pi*pow(Rj,static_cast<real>(3.0))*rho_[propId_j];
 
 		real sqrt_meff = sqrt((mi*mj)/(mi+mj));
 

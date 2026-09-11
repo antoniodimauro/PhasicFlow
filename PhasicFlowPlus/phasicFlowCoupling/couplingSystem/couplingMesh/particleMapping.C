@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -34,12 +36,29 @@ pFlow::coupling::particleMapping::particleMapping
     (
         Foam::max(lookupDict<Foam::scalar>(dict, "domainExpansionRatio"), 0.5)
     ),
-    domainUpdateInterval_
-    (
-        lookupDict<Foam::scalar>(dict, "domainUpdateInterval")
-    )
+    domainUpdateInterval_(0)
 {
+    Foam::ITstream& intervalStream = dict.lookup("domainUpdateInterval");
+    Foam::token intervalToken(intervalStream);
 
+    if(intervalToken.isWord("everyTimeStep"))
+    {
+        updateEveryTimeStep_ = true;
+        domainUpdateInterval_ = 0;
+    }
+    else if(intervalToken.isNumber())
+    {
+        domainUpdateInterval_ = intervalToken.number();
+    }
+    else
+    {
+        fatalErrorInFunction
+            << "Invalid value for domainUpdateInterval. Use a scalar value "
+            << "(seconds) or the keyword everyTimeStep." << endl;
+        Plus::processor::abort(0);
+    }
+
+    dict.checkITstream(intervalStream, "domainUpdateInterval");
 }
 
 
@@ -49,6 +68,9 @@ bool pFlow::coupling::particleMapping::checkForDomainUpdate
     Foam::scalar fluidDt
 )const
 {
+    const Foam::scalar updateInterval =
+        updateEveryTimeStep_ ? fluidDt : domainUpdateInterval_;
+
     if( !firstConstructed_ )
     {
         return true;
@@ -58,8 +80,8 @@ bool pFlow::coupling::particleMapping::checkForDomainUpdate
     {
         return true;
     }
-    
-    if( std::abs(t-(lastTimeUpdated_+domainUpdateInterval_)) < static_cast<Foam::scalar>(0.98*fluidDt))
+
+    if( std::abs(t-(lastTimeUpdated_+updateInterval)) < static_cast<Foam::scalar>(0.98*fluidDt))
     {
         return true;
     }
@@ -82,8 +104,14 @@ bool pFlow::coupling::particleMapping::update
 
         lastTimeUpdated_ = t;
 
+        const bool report = (t != lastTimeReported_);
+        lastTimeReported_ = t;
+
+        if(report)
+        {
         REPORT(0)<<Blue_Text("Particle mapping in processors at time :")<< 
             Yellow_Text(t) <<" s"<<END_REPORT;
+        }
 
         auto mBox = cMesh.meshBox();
 
@@ -93,6 +121,7 @@ bool pFlow::coupling::particleMapping::update
             Plus::processor::abort(0);
         }
 
+        if(report)
         REPORT(1)<< "Mesh boxes on all processors updated"<<pFlow::endl;
 
         if(!pDEMSystem.updateParticleDistribution(
@@ -104,6 +133,7 @@ bool pFlow::coupling::particleMapping::update
             return false;
         }
 
+        if(report)
         REPORT(1)<< "Re-mapped particles on all boxes"<<pFlow::endl;
 
         auto numParsInDomains = pDEMSystem.numParInDomainMaster();
@@ -155,6 +185,7 @@ bool pFlow::coupling::particleMapping::update
             return false;
         }
 
+        if(report)
         REPORT(1)<< "Data mapping updated"<<pFlow::endl;
     }
 

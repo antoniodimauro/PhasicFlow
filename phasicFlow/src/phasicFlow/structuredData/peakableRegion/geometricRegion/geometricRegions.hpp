@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating
@@ -25,6 +27,7 @@ Licence:
 #include "box.hpp"
 #include "sphere.hpp"
 #include "cylinder.hpp"
+#include "pointGeom.hpp"
 
 namespace pFlow
 {
@@ -34,6 +37,8 @@ using boxRegion = geometricRegion<box>;
 using sphereRegion = geometricRegion<sphere>;
 
 using cylinderRegion = geometricRegion<cylinder>;
+
+using pointRegion = geometricRegion<pointGeom>;
 
 }
 

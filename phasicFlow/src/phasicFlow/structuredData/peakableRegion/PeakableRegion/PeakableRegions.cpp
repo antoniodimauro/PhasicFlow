@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -27,3 +29,4 @@ template class pFlow::PeakableRegion<pFlow::box>;
 template class pFlow::PeakableRegion<pFlow::sphere>;
 
 template class pFlow::PeakableRegion<pFlow::cylinder>;
+template class pFlow::PeakableRegion<pFlow::pointGeom>;

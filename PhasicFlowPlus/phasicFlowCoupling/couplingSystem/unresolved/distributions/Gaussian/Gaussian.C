@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -82,8 +84,10 @@ pFlow::coupling::Gaussian::Gaussian
 )
 :
     distribution(dict, cMesh, centerMass),	
-    standardDeviation_(lookupDict<Foam::scalar>(dict, "standardDeviation")),
-    maxLayers_(lookupOrDefaultDict<Foam::label>(dict, "maxLayers", 2))
+    standardDeviation_(
+        lookupDict<Foam::scalar>(infoDict(dict, "GaussianInfo"), "standardDeviation")),
+    maxLayers_(
+        lookupOrDefaultDict<Foam::label>(infoDict(dict, "GaussianInfo"), "maxLayers", 2))
 {
     
 }

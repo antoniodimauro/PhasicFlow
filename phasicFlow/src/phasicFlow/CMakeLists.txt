@@ -1,3 +1,5 @@
+# Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+# changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 list(APPEND SourceFiles 
 types/basicTypes/bTypesFunctions.cpp
 types/basicTypes/Logical.cpp
@@ -72,6 +74,7 @@ structuredData/zAxis/zAxis.cpp
 structuredData/box/box.cpp
 structuredData/sphere/sphere.cpp
 structuredData/cylinder/cylinder.cpp
+structuredData/pointGeom/pointGeom.cpp
 structuredData/peakableRegion/geometricRegion/geometricRegions.cpp
 structuredData/peakableRegion/PeakableRegion/PeakableRegions.cpp
 structuredData/peakableRegion/peakableRegion/peakableRegion.cpp
@@ -114,8 +117,10 @@ setFieldList/setFieldEntry.cpp
 
 )
 
-set(link_libs)
-set(link_libs Kokkos::kokkos tbb)
+set(link_libs Kokkos::kokkos)
+if(pFlow_STD_Parallel_Alg)
+	set(link_libs ${link_libs} tbb)
+endif()
 	
 
 # for MPI parallelization

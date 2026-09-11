@@ -1,10 +1,15 @@
 #!/bin/sh
+# Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+# changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 cd ${0%/*} || exit 1    # Run from this directory
 
 
 # Compile OpenFOAM libraries and applications
 echo "  -> building pFCouplingUtilities"
 wmake ./pFCouplingUtilities
+
+echo "  -> building mapParticleVelocityFromU"
+wmake ./mapParticleVelocityFromU
 
 
 

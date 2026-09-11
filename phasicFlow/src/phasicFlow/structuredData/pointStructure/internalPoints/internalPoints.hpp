@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -195,6 +197,27 @@ public:
 		bool isAllActive()const
 		{
 			return pFlagsD_.isAllActive();
+		}
+
+		inline
+		void markAllInternalActive(uint32 n)
+		{
+			const uint32 cap = max(pointPosition_.capacity(), n);
+			createDeviceFlag(cap, 0u, n);
+		}
+
+		/// C13: snapshot of the point flags (deep copy), taken at the start of a fluid step
+		pFlagTypeDevice activeFlagsClone()const
+		{
+			return pFlagsD_.template clone<DefaultExecutionSpace>();
+		}
+
+		/// C13: restore a snapshot of activeFlagsClone(): slots deleted or inserted after it come back as they were
+		void restoreActiveFlags(const pFlagTypeDevice& saved)
+		{
+			const uint32 cap = max(pointPosition_.capacity(), saved.capacity());
+			createDeviceFlag(cap, 0u, 0u);
+			pFlagsD_.restoreFrom(saved);
 		}
 
 		inline

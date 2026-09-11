@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -90,6 +92,12 @@ public:
 	{
 		return geometry_;
 	}
+
+	// C8: save the contact lists (pairs and histories) at the start of a fluid step and restore them before every
+	// repeated coupling pass; no-ops for interactions without contact history
+	virtual void saveContactState(){}
+
+	virtual void restoreContactState(){}
 
 	static 
 	uniquePtr<interaction> create(

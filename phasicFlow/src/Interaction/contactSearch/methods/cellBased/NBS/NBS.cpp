@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -46,11 +48,13 @@ pFlow::NBS::NBS
         diam),
     sizeRatio_(max(dict.getVal<real>("sizeRatio"), one)),
     cellExtent_(max(dict.getVal<real>("cellExtent"), half)),
-    adjustableBox_(false),//adjustableBox_(dict.getVal<Logical>("adjustableBox")),
+    adjustableBox_(dict.getValOrSet("adjustableBox", Logical("Yes"))),
     NBSLevel0_
 	(
         this->domainBox_,
-        maxBSSize,
+        // cells of the enlarged bounding sphere: pairs are listed out to sizeRatio*(Ri + Rj), so two particles
+        // listed together must lie in the same or in adjacent cells (Norouzi 2023, sec. 4.2.1)
+        max(dict.getVal<real>("sizeRatio"), one)*maxBSSize,
         sizeRatio_,
         position,
         flags,

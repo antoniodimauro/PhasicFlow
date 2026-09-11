@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating
@@ -99,8 +101,9 @@ private:
 	/// @brief time control for insertion events
 	baseTimeControl           tControl_;
 
-	/// rate of insertion
-	real                      rate_;
+	real                      rate_ = 0;
+
+	uint32                    countPerEvent_ = 0;
 
 	/// number of inserted particles
 	uint32                    numInserted_ = 0;
@@ -176,6 +179,11 @@ public:
 		return tControl_.eventTime(iter, t, dt);
 	}
 
+	inline bool usesCountPerEvent() const
+	{
+		return countPerEvent_ != 0u;
+	}
+
 	uint32        numberToBeInserted(uint32 iter, real t, real dt);
 
 	inline uint32 addToNumInserted(uint32 newInserted)
@@ -186,6 +194,15 @@ public:
 	inline uint32 totalInserted() const
 	{
 		return numInserted_;
+	}
+
+	inline void setNumInserted(uint32 n)
+	{
+		numInserted_ = n;
+		if (mixture_)
+		{
+			mixture_().rewindTo(n);
+		}
 	}
 
 	auto& mixture()
