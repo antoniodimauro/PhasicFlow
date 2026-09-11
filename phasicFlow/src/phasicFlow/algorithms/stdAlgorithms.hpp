@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -21,12 +23,19 @@ Licence:
 #ifndef __stdAlgorithms_hpp__ 
 #define __stdAlgorithms_hpp__
 
+#include <numeric>
 #include <algorithm>
-#include <execution>
 
 #include "pFlowMacros.hpp"
 #include "algorithmFunctions.hpp"
 #include "types.hpp"
+
+#ifdef pFlow_STD_Parallel_Alg
+    #include <execution>
+    #define PFLOW_PAR_POLICY std::execution::par_unseq,
+#else
+    #define PFLOW_PAR_POLICY
+#endif
 
 namespace pFlow::algorithms::STD
 {
@@ -37,7 +46,7 @@ int32 count(const Type* first, int32 numElems, const Type& val)
 {
 	if constexpr (useParallel)
 		return std::count_if(
-			std::execution::par_unseq,
+			PFLOW_PAR_POLICY
 			first, first+numElems,
 			[=](const Type& check){ return equal(check,val);} );
 	else
@@ -53,7 +62,7 @@ INLINE_FUNCTION_H
 void fill(Type* first, int32 numElems, const Type& val)
 {
 	if constexpr (useParallel)
-		std::fill(std::execution::par_unseq, first, first+numElems, val);
+		std::fill(PFLOW_PAR_POLICY first, first+numElems, val);
 	else
 		std::fill(first, first+numElems, val);
 }
@@ -65,7 +74,7 @@ void fillSelected(Type* first, const indexType* indices, const int32 numElems, c
 	if constexpr(useParallel)
 	{
 		std::for_each_n(
-			std::execution::par_unseq,
+			PFLOW_PAR_POLICY
 			indices,
 			numElems,
 			[=](indexType i){
@@ -99,7 +108,7 @@ void fillSequence(Type* first, int32 numElems, const Type& firstVal)
 {
 	if constexpr (useParallel)
 		std::for_each_n(
-			std::execution::par_unseq,
+			PFLOW_PAR_POLICY
 			first,
 			numElems,
 			[=](Type& ref){ ref = firstVal+std::distance(first,&ref);});
@@ -113,7 +122,7 @@ Type max(const Type* first, int32 numElems)
 {
 	if constexpr(useParallel)
 		return *std::max_element(
-				std::execution::par_unseq,
+				PFLOW_PAR_POLICY
 				first,
 				first+numElems,
 				less<Type>());
@@ -130,7 +139,7 @@ Type min(const Type* first, int32 numElems)
 {
 	if constexpr(useParallel)
 		return *(std::min_element(
-				std::execution::par_unseq,
+				PFLOW_PAR_POLICY
 				first,
 				first+numElems,
 				less<Type>()));
@@ -148,7 +157,7 @@ void sort(Type* first, int32 numElems)
 	if constexpr(useParallel)
 	{
 		std::sort(
-			std::execution::par_unseq,
+			PFLOW_PAR_POLICY
 			first,
 			first+numElems,
 			less<Type>());
@@ -169,7 +178,7 @@ void sort(Type* first, int32 numElems, CompareFunc compare)
 	if constexpr(useParallel)
 	{
 		std::sort(
-			std::execution::par_unseq,
+			PFLOW_PAR_POLICY
 			first,
 			first+numElems,
 			compare);
@@ -225,7 +234,7 @@ void inclusiveScan(Type* first, DestType* dFirst, int32 numElems)
 	if constexpr (useParallel)
 	{
 		std::inclusive_scan(
-			std::execution::par_unseq,
+			PFLOW_PAR_POLICY
 			first, first+numElems,
 			dFirst);
 	}
@@ -239,5 +248,6 @@ void inclusiveScan(Type* first, DestType* dFirst, int32 numElems)
 
 }
 
+#undef PFLOW_PAR_POLICY
 
 #endif //__stdAlgorithms_hpp__

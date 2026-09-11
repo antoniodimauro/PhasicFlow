@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -65,7 +67,7 @@ public:
 	
 
 
-private:
+protected:
 	
 	/// const reference to geometry
 	const GeometryMotionModel& 			geometryMotion_;
@@ -91,6 +93,10 @@ private:
 	/// contact list for particle-wall interactions (keeps the history)
 	uniquePtr<ContactListType> 			pwContactList_ = nullptr;
 
+	/// C8: set by restoreContactState(): the search schedule counts DEM iterations, which are not rewound, so the
+	/// restored step-start lists are re-searched on the first iteration after a restore
+	bool 								forceSearch_ = false;
+
 
 	/// timer for particle-particle interaction computations
 	Timer 		ppInteractionTimer_;
@@ -110,7 +116,7 @@ private:
 
 	bool createSphereInteraction();
 
-	bool sphereSphereInteraction();
+	virtual bool sphereSphereInteraction();
 
 	bool sphereWallInteraction();
 
@@ -145,6 +151,19 @@ public:
 	
 	/// This is called in time loop. Perform the main calculations 
 	/// when the component should evolve along time. (overriden from demComponent)
+	void saveContactState() override
+	{
+		if(ppContactList_) ppContactList_->saveState();
+		if(pwContactList_) pwContactList_->saveState();
+	}
+
+	void restoreContactState() override
+	{
+		if(ppContactList_) ppContactList_->restoreState();
+		if(pwContactList_) pwContactList_->restoreState();
+		forceSearch_ = true;
+	}
+
 	bool iterate() override; 
 	
 	/// This is called in time loop, after iterate. (overriden from demComponent)

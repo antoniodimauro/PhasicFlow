@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+#------------------------------------------------------------------------------
+# Copyright (C): Antonio Di Mauro  <antoniodimauro03@gmail.com>
+# Builds phasicFlow (CMake) and PhasicFlowPlus (wmake) into
+# $WM_PROJECT_USER_DIR/platforms/$WM_OPTIONS.
+#   ./Allwmake [-j N] [--core-only|--plus-only] [--fresh] [--serial-stl]
+#------------------------------------------------------------------------------
+set -euo pipefail
+cd "$(dirname "$(readlink -f "$0")")"
+PF_ROOT="$PWD"
+
+die() { echo "ERROR: $*" >&2; exit 1; }
+
+# ---- environment check ------------------------------------------------------
+[ -n "${WM_PROJECT_DIR:-}"       ] || die "OpenFOAM environment not sourced (WM_PROJECT_DIR unset).
+       source <openfoam>/etc/bashrc   first."
+[ -n "${WM_PROJECT_USER_DIR:-}"  ] || die "WM_PROJECT_USER_DIR unset - OpenFOAM environment is incomplete."
+[ -n "${WM_OPTIONS:-}"           ] || die "WM_OPTIONS unset - OpenFOAM environment is incomplete."
+
+PREFIX="$WM_PROJECT_USER_DIR/platforms/$WM_OPTIONS"
+
+# ---- cmake check ------------------------------------------------------------
+command -v cmake >/dev/null 2>&1 || die "cmake not found.
+       On the cluster:  module load cmake/3.27.7"
+cmake_ver="$(cmake --version | head -1 | awk '{print $3}')"
+cmake_major="${cmake_ver%%.*}"; cmake_rest="${cmake_ver#*.}"; cmake_minor="${cmake_rest%%.*}"
+if [ "$cmake_major" -lt 3 ] || { [ "$cmake_major" -eq 3 ] && [ "$cmake_minor" -lt 16 ]; }; then
+    die "cmake $cmake_ver is too old (need >= 3.16).
+       On the cluster:  module load cmake/3.27.7"
+fi
+
+# ---- arguments --------------------------------------------------------------
+NJOBS="${SLURM_CPUS_ON_NODE:-$(nproc)}"
+DO_CORE=1; DO_PLUS=1; FRESH=0; PAR_STL=ON
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -j)           NJOBS="$2"; shift 2 ;;
+        -j*)          NJOBS="${1#-j}"; shift ;;
+        --core-only)  DO_PLUS=0; shift ;;
+        --plus-only)  DO_CORE=0; shift ;;
+        --fresh)      FRESH=1; shift ;;
+        --serial-stl) PAR_STL=OFF; shift ;;
+        -h|--help)    sed -n '2,25p' "$0"; exit 0 ;;
+        *)            die "unknown argument: $1" ;;
+    esac
+done
+
+# ---- compiler: exactly the one wmake uses -----------------------------------
+export CC="$(wmake -show-c   2>/dev/null || echo gcc)"
+export CXX="$(wmake -show-cxx 2>/dev/null || echo g++)"
+
+cxx_path="$(command -v "$CXX" 2>/dev/null || true)"
+[ -n "$cxx_path" ] || die "compiler '$CXX' not found on PATH."
+cxx_ver="$($CXX -dumpfullversion -dumpversion 2>/dev/null || echo 0)"
+
+# Kokkos 4.4.1 needs GCC >= 10.1
+if $CXX --version 2>/dev/null | head -1 | grep -qiE '\bg(cc|\+\+)\b|GCC'; then
+    cxx_major="${cxx_ver%%.*}"; cxx_rest="${cxx_ver#*.}"; cxx_minor="${cxx_rest%%.*}"
+    if [ "${cxx_major:-0}" -lt 10 ] || { [ "$cxx_major" -eq 10 ] && [ "${cxx_minor:-0}" -lt 1 ]; }; then
+        die "g++ $cxx_ver is too old -- Kokkos 4.4.1 needs GCC >= 10.1.0 for C++20.
+       Resolved to: $cxx_path
+       This is almost certainly the SYSTEM compiler because the toolchain
+       module is not loaded. On the cluster, source the OpenFOAM environment
+       FIRST (it runs 'module purge'), then add cmake:
+           source /g100_work/IscrC_CARAPAC2/dev/foam/setEnv.sh -p
+           module load cmake/3.27.7
+       Then check:  module list   &&   g++ --version"
+    fi
+fi
+
+echo "==============================================================="
+echo " PhasicFlow build"
+echo "   OpenFOAM      : $WM_PROJECT_VERSION  ($WM_OPTIONS)"
+echo "   install prefix: $PREFIX"
+echo "   compiler      : $CXX  ($cxx_ver)  ->  $cxx_path"
+echo "   jobs          : $NJOBS"
+echo "==============================================================="
+
+# ---- 1. phasicFlow core (CMake) ---------------------------------------------
+if [ "$DO_CORE" = 1 ]; then
+    BUILD="$PF_ROOT/build/$WM_OPTIONS"
+    if [ "$FRESH" = 1 ]; then rm -rf "$BUILD"; fi
+    mkdir -p "$BUILD"
+
+    echo; echo ">>> phasicFlow core -> $PREFIX"
+    # Kokkos submodule
+    if [ ! -f "$PF_ROOT/phasicFlow/thirdParty/kokkos/CMakeLists.txt" ] && [ -d "$PF_ROOT/.git" ]; then
+        git -C "$PF_ROOT" submodule update --init phasicFlow/thirdParty/kokkos
+    fi
+    cmake -S "$PF_ROOT/phasicFlow" -B "$BUILD" \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DpFlow_Build_OpenMP=On \
+          -DpFlow_STD_Parallel_Alg="$PAR_STL" \
+          -DKokkos_ENABLE_OPENMP=ON \
+          -DKokkos_ENABLE_SERIAL=ON
+
+    cmake --build "$BUILD" --target install -j "$NJOBS"
+
+    # make the install visible from inside the source tree
+    ln -sfn "$WM_PROJECT_USER_DIR/platforms" "$PF_ROOT/platforms"
+
+    cfg="$PREFIX/include/kokkos/KokkosCore_config.h"
+    [ -f "$cfg" ] || cfg="$(find "$PREFIX/include" -name KokkosCore_config.h 2>/dev/null | head -1)"
+    if [ -n "$cfg" ] && grep -q '^#define KOKKOS_ENABLE_OPENMP' "$cfg"; then
+        echo "    OK: Kokkos OpenMP backend compiled in"
+    else
+        echo "    WARNING: Kokkos OpenMP backend NOT enabled - DEM would run single-threaded"
+    fi
+fi
+
+# ---- 2. PhasicFlowPlus (wmake) ----------------------------------------------
+if [ "$DO_PLUS" = 1 ]; then
+    echo; echo ">>> PhasicFlowPlus -> $FOAM_USER_APPBIN"
+    cd "$PF_ROOT/PhasicFlowPlus"
+    if [ "$FRESH" = 1 ]; then ./Allwclean; fi
+    ./Allwmake -j "$NJOBS"
+fi
+
+echo
+echo "==============================================================="
+echo " done."
+echo "   solver    : $PREFIX/bin/unresolvedSpherePFPlus"
+echo "   utilities : particlesPhasicFlow geometryPhasicFlow pFlowToVTK"
+echo "               postprocessPhasicFlow checkPhasicFlow mapParticleVelocityFromU"
+echo " Nothing else to source: the OpenFOAM environment already exports"
+echo " $PREFIX/{bin,lib} on PATH / LD_LIBRARY_PATH."
+echo "==============================================================="

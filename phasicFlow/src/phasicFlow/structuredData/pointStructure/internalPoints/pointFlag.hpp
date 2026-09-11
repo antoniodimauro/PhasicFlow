@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -285,6 +287,23 @@ public:
 	bool isFront(uint8 flg)const
 	{
 		return flg&FRONT;
+	}
+
+	/// C13: take the flags and counts of a snapshot of the same execution space. Slots beyond the snapshot's
+	/// capacity stay DELETED; the active range and count are the snapshot's.
+	void restoreFrom(const pointFlag& saved)
+	{
+		const uint32 cap = static_cast<uint32>(flags_.extent(0));
+		fill(flags_, 0u, cap, static_cast<uint8>(Flag::DELETED));
+		const uint32 n = min(cap, static_cast<uint32>(saved.flags_.extent(0)));
+		if(n > 0)
+		{
+			const auto rng = Kokkos::make_pair(0u, n);
+			Kokkos::deep_copy(Kokkos::subview(flags_, rng), Kokkos::subview(saved.flags_, rng));
+		}
+		numActive_   = saved.numActive_;
+		activeRange_ = saved.activeRange_;
+		isAllActive_ = saved.isAllActive_;
 	}
 
 	template<typename ExeSpace>

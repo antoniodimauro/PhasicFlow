@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -19,6 +21,7 @@ Licence:
 -----------------------------------------------------------------------------*/
 
 #include "porosity.hpp"
+#include "PstreamReduceOps.H"
 #include "procVectorPlus.hpp"
 #include "procCommunicationPlus.hpp"
 #include "streams.hpp"
@@ -75,8 +78,53 @@ pFlow::int32 pFlow::coupling::porosity::numInMesh() const
 
 void pFlow::coupling::porosity::calculatePorosity()
 {
+	// Keep alpha^n as the old time. internalFieldUpdate writes through the plain field index, which stores no old
+	// time, so without this the correctBoundaryConditions() below would store the new field and fvc::ddt(alpha) would
+	// be zero (QUESTIONS.md G7). The time-index guard of storeOldTimes() makes the first call of a step store it;
+	// later passes, the rollback and the write repeat keep it.
+	this->storeOldTimes();
+
 	this->internalFieldUpdate();
-	this->correctBoundaryConditions();	
+	this->correctBoundaryConditions();
+
+	// A particle that is inserted or deleted in this step changes alpha with no displacement flow behind it: for that
+	// step the old time is set to the new alpha, so it produces no dalpha/dt.
+	// The count is of the particles whose centre is in a cell of this rank: each particle has one host cell, while
+	// the rank arrays overlap (extended domains, domainDistribute.cpp), so their sizes change at a border crossing.
+	const Foam::label tIdx = this->mesh().time().timeIndex();
+	Foam::label nHosted = 0;
+	{
+		const auto& pci = parCellIndex();
+		for(size_t i=0; i<pci.size(); ++i)
+		{
+			if(pci[i] >= 0) nHosted++;
+		}
+	}
+	const Foam::label nNow = Foam::returnReduce(nHosted, Foam::sumOp<Foam::label>());
+
+	if(tIdx != countTimeIndex_)
+	{
+		countChanged_   = (nPrevCount_ >= 0 && nNow != nPrevCount_);
+		nPrevCount_     = nNow;
+		countTimeIndex_ = tIdx;
+	}
+
+	if(countChanged_)
+	{
+		this->oldTime() == *this;
+	}
+
+	if(ddtReports_ < 3 && this->nOldTimes() > 0)
+	{
+		const Foam::scalar dMax = Foam::gMax
+		(
+			Foam::mag(this->primitiveField() - this->oldTime().primitiveField())()
+		);
+		Foam::Info<< "    porosity: max|alpha - alpha.oldTime()| = " << dMax
+			<< (countChanged_ ? " (particle count changed: no dalpha/dt this step)" : "")
+			<< Foam::endl;
+		ddtReports_++;
+	}
 }
 
 

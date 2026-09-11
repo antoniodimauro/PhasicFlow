@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -58,6 +60,14 @@ int main( int argc, char* argv[] )
 		"-c,--coupling",
 		isCoupling,
 		"Is this a fluid-particle coupling simulation");
+
+	bool initIds = false;
+	cmds.add_flag(
+		"--init",
+		initIds,
+		"Initialize id field with sequential values (0..N-1) "
+		"at the first time step. Without this flag, the id field "
+		"is not created by this utility.");
 
 	if(!cmds.parse(argc, argv)) return 0;
 	
@@ -212,11 +222,22 @@ int main( int argc, char* argv[] )
 	}
 	
 
+	if(initIds && pStructPtr && Control.time().lookupObjectName("id"))
+	{
+		auto& idField =
+			Control.time().template lookupObject<pFlow::uint32PointField_H>("id");
+
+		fillSequence(idField, 0u);
+
+		REPORT(0)<< "Initialized id field with sequential values [0.."
+			<< idField.size()-1 << "]" << END_REPORT;
+	}
+
     if( !Control.time().write(true))
     {
         fatalErrorInFunction<<
         "ERRor in writing to file. \n ";
-        return 1; 
+        return 1;
     }
 	REPORT(0)<< Green_Text("\nFinished successfully.\n")<<END_REPORT;
 

@@ -1,0 +1,14 @@
+# CMake build trees, one per WM_OPTIONS
+/build/
+
+# convenience symlink to $WM_PROJECT_USER_DIR/platforms, made by Allwmake
+/platforms
+
+# wmake artefacts
+**/Make/linux*
+**/Make/darwin*
+**/lnInclude/
+PhasicFlowPlus/phasicFlowCoupling/OFVersion.H
+# build transcripts
+*.log
+slog.*

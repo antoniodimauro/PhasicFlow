@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -58,6 +60,16 @@ protected:
 	ViewType1D<PairType,ExecutionSpace> 	sortedPairs0_;
 
 	ViewType1D<ValueType,ExecutionSpace> 	values0_;
+
+	// C8: the pairs and contact histories at the start of a fluid step, restored before every repeated coupling pass
+	// so that the tangential springs advance once per step (QUESTIONS.md G9)
+	ViewType1D<PairType,ExecutionSpace> 	savedPairs_;
+
+	ViewType1D<ValueType,ExecutionSpace> 	savedValues_;
+
+	uint32 									savedSize_ = 0;
+
+	bool 									hasSaved_ = false;
 
 
 	void adjustCapacity()
@@ -115,6 +127,35 @@ public:
 		Kokkos::fence();
 
 		return true;
+	}
+
+	void saveState()
+	{
+		savedSize_ = this->size();
+		const uint32 n = max(savedSize_, 1u);
+		if(savedPairs_.size() < n)  reallocNoInit(savedPairs_, n);
+		if(savedValues_.size() < n) reallocNoInit(savedValues_, n);
+		if(savedSize_ > 0)
+		{
+			const auto rng = Kokkos::make_pair(0u, savedSize_);
+			Kokkos::deep_copy(Kokkos::subview(savedPairs_, rng),  Kokkos::subview(this->sortedPairs_, rng));
+			Kokkos::deep_copy(Kokkos::subview(savedValues_, rng), Kokkos::subview(values_, rng));
+		}
+		hasSaved_ = true;
+	}
+
+	void restoreState()
+	{
+		if(!hasSaved_) return;
+		if(this->sortedPairs_.size() < savedSize_) reallocNoInit(this->sortedPairs_, savedSize_);
+		if(values_.size() < savedSize_)            reallocNoInit(values_, savedSize_);
+		if(savedSize_ > 0)
+		{
+			const auto rng = Kokkos::make_pair(0u, savedSize_);
+			Kokkos::deep_copy(Kokkos::subview(this->sortedPairs_, rng), Kokkos::subview(savedPairs_, rng));
+			Kokkos::deep_copy(Kokkos::subview(values_, rng),            Kokkos::subview(savedValues_, rng));
+		}
+		this->size_ = savedSize_;
 	}
 
 	INLINE_FUNCTION_HD

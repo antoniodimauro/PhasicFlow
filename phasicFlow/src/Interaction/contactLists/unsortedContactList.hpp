@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -94,6 +96,21 @@ public:
 		values0_(groupNames(name, "values0"),container0_.capacity())
 	{}
 
+
+	// C8: the step-start contact state is restored only by sortedContactList (contactListType sortedContactList, the
+	// setting of every case); here the histories are not rewound between coupling passes
+	void saveState()
+	{
+		static bool warned = false;
+		if(!warned)
+		{
+			warned = true;
+			WARNING<<"unsortedContactList: the contact histories are not rewound between coupling passes; "
+				"use contactListType sortedContactList."<<END_WARNING;
+		}
+	}
+
+	void restoreState(){}
 
 	bool beforeBroadSearch()
 	{

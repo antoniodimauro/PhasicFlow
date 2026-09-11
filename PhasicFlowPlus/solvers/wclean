@@ -1,4 +1,6 @@
 #!/bin/sh
+# Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+# changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 cd ${0%/*} || exit 1    # Run from this directory
 
 
@@ -10,6 +12,7 @@ if [ "$WM_PROJECT_VERSION" = "9" ] || [ "$WM_PROJECT_VERSION" = "10" ] || [ "$WM
 elif [ "$WM_PROJECT_VERSION" = "v2406" ] || [ "$WM_PROJECT_VERSION" = "v2412" ] || [ "$WM_PROJECT_VERSION" = "v2506" ] || [ "$WM_PROJECT_VERSION" = "v2512" ]; then
     echo "  -> Cleaning solvers for OpenFOAM $WM_PROJECT_VERSION"
     wclean ./unresolvedSpherePFPlus
+    wclean ./unresolvedSphereSemiImplicitPFPlus
     wclean ./unresolvedGrainPFPlus
     wclean ./resolvedSpherePFPlus
     wclean ./resolvedSphereVoFPFPlus

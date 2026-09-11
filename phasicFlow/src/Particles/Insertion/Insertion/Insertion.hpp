@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating
@@ -20,6 +22,8 @@ Licence:
 
 #ifndef __Insertion_hpp__
 #define __Insertion_hpp__
+
+#include <vector>
 
 #include "InsertionRegion.hpp"
 #include "ListPtr.hpp"
@@ -77,6 +81,25 @@ public:
 	// Insertion(fileSystem file, particles& prtcl, const ShapeType& shapes);
 
 	bool insertParticles(uint32 iter, real t, real dt);
+
+	std::vector<uint32> getAllNumInserted()
+	{
+		std::vector<uint32> result;
+		result.reserve(regions_.size());
+		for(size_t i=0; i<regions_.size(); ++i)
+		{
+			result.push_back(regions_[i].totalInserted());
+		}
+		return result;
+	}
+
+	void setAllNumInserted(const std::vector<uint32>& vals)
+	{
+		for(size_t i=0; i<regions_.size() && i<vals.size(); ++i)
+		{
+			regions_[i].setNumInserted(vals[i]);
+		}
+	}
 
 	/*virtual bool read(iIstream& is) override;
 

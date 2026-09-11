@@ -1,3 +1,5 @@
+# Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+# changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 
 set(SourceFiles 
 contactSearch/methods/cellBased/NBS/mapperNBS.cpp
@@ -21,6 +23,8 @@ interaction/interaction.cpp
 sphereInteraction/sphereInteractionsLinearModels.cpp
 sphereInteraction/sphereInteractionsNonLinearModels.cpp
 sphereInteraction/sphereInteractionsNonLinearModModels.cpp
+sphereInteraction/sphereInteractionsCostaModels.cpp
+sphereInteraction/sphereInteractionsLubModels.cpp
 
 grainInteraction/grainInteractionsLinearModels.cpp
 grainInteraction/grainInteractionsNonLinearModels.cpp

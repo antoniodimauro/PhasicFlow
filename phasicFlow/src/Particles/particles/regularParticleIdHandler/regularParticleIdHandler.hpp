@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -54,6 +56,11 @@ public:
 	uint32 maxId()const override
 	{
 		return maxId_;
+	}
+
+	void setMaxId(uint32 id)
+	{
+		maxId_ = id;
 	}
 
 };

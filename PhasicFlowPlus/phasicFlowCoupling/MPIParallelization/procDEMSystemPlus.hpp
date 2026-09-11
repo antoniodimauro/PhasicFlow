@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -61,6 +63,12 @@ public:
 	real startTime()const
 	{
 		return startTime_;
+	}
+
+	inline
+	DEMSystem* demSystemPtr()
+	{
+		return demSystem_.get();
 	}
 
 	inline 

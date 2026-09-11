@@ -1,3 +1,5 @@
+# Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+# changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 
 list(APPEND SourceFiles 
 integration/integration.cpp
@@ -10,6 +12,7 @@ AdamsBashforth5/AdamsBashforth5.cpp
 
 #AdamsMoulton3/AdamsMoulton3.cpp
 #AdamsMoulton4/AdamsMoulton4.cpp
+AdamsMoulton4PEC/AdamsMoulton4PEC.cpp
 #AdamsMoulton5/AdamsMoulton5.cpp
 )
 

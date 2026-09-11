@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------------
   Copyright (C): www.cemf.ir
   email: hamid.r.norouzi AT gmail.com
+  Modified in 2026 by Antonio Di Mauro (T-junction CFD-DEM study);
+  changes: git diff cf6d3fb main, github.com/antoniodimauro/PhasicFlow
 ------------------------------------------------------------------------------  
 Licence:
   This file is part of phasicFlow code. It is a free software for simulating 
@@ -169,7 +171,10 @@ bool pFlow::sphereInteraction<cFM,gMM, cLT>::iterate()
 
 	auto& contactSearchRef = contactSearch_();
 
-	bool broadSearch = contactSearchRef.enterBroadSearch(ti);
+	const bool forceSearch = forceSearch_;
+	forceSearch_ = false;
+
+	bool broadSearch = contactSearchRef.enterBroadSearch(ti, forceSearch);
 	bool broadSearchBoundary = contactSearchRef.enterBroadSearchBoundary(ti);
 
 	/// update boundaries of the fields that are being used by inreaction 
@@ -215,7 +220,8 @@ bool pFlow::sphereInteraction<cFM,gMM, cLT>::iterate()
 	if( !contactSearchRef.broadSearch(
 			ti,		
 			ppContactList_(),
-			pwContactList_()) )
+			pwContactList_(),
+			forceSearch) )
 	{
 		fatalErrorInFunction<<
 		"unable to perform broadSearch.\n";
